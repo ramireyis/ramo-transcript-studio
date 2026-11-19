@@ -1,31 +1,14 @@
-# Ramo Transcript Studio
+# RamoAltyazi v2
 
-Netlify için Türkçe YouTube transkript paneli. YouTube altyazısı, toplu URL, TXT/SRT/VTT, yerel geçmiş, metin düzenleme, ses dosyası ve OpenAI ile içerik üretimi.
+Sade, dört dilli YouTube transkript paneli. Netlify Functions kullanır.
 
 ## Kurulum
 
-1. ZIP dosyasını açın ve klasörü GitHub deposuna yükleyin.
-2. Netlify > Add new project > Import an existing project > GitHub deposunu seçin.
-3. Build command boş bırakılabilir (veya `npm run build`); Publish directory `.`; Functions directory `netlify/functions`.
-4. Site configuration > Environment variables bölümüne şunları ekleyin:
-   - `SUPADATA_API_KEY`: https://supadata.ai/ üzerinden alınan API anahtarı. YouTube altyazısı için gerekli.
-   - `OPENAI_API_KEY`: https://platform.openai.com/api-keys üzerinden alınan API anahtarı. AI araçları ve ses yükleme için gerekli.
-   - `OPENAI_MODEL`: isteğe bağlı, varsayılan `gpt-4o-mini`.
-5. Deploy / Trigger deploy yapın.
+1. ZIP içeriğini GitHub deposunun köküne yükleyin. `netlify/functions/transcript.mjs` dosyasının klasör yolunu koruyun.
+2. Netlify projesini GitHub deposuna bağlayın; build command boş, publish directory `.` olabilir. `netlify.toml` fonksiyon klasörünü belirtir.
+3. Netlify > Project configuration > Environment variables bölümünde `SUPADATA_API_KEY` değerini ekleyin. Anahtarı asla GitHub'a veya HTML dosyasına koymayın.
+4. Yeni deploy yapın. `/api/transcript` POST endpoint'ini panelden test edin.
 
-**Önemli:** Netlify'a yalnızca statik ZIP sürükleyip bırakmak Functions API'lerinin dağıtılması için güvenilir yöntem değildir. GitHub üzerinden Netlify build/deploy kullanın. Anahtarları HTML veya GitHub'a yazmayın.
+ÖNEMLİ: Bu sürüm mevcut `index.html`, `netlify.toml`, `package.json` ve `netlify/functions/transcript.mjs` dosyalarının yerini alır. Eski sürümü önce yedekleyin. Diğer eski fonksiyonlar kullanılıyorsa yerinde kalabilir, ancak yeni arayüz yalnızca transcript fonksiyonunu çağırır.
 
-## Teknik sınırlar
-
-- YouTube altyazısı Supadata'nın erişimine, video izinlerine ve sağlayıcının güncel API sözleşmesine bağlıdır. Bazı videolar için altyazı yoktur veya erişim engellenir.
-- Bu sürüm altyazısı olmayan YouTube videolarının sesini otomatik indirmez. Bunun için yasal erişimi olan bir medya alma/transkripsiyon hattı ayrıca gerekir.
-- Ses yükleme 3 MB ile sınırlıdır (Netlify Functions isteği boyutu/zaman sınırları). Büyük dosyalar için blob depolama + asenkron işleme önerilir.
-- Toplu URL'ler sırayla çalışır; ücretlendirme API sağlayıcılarının tarifelerine bağlıdır.
-- Geçmiş tarayıcı localStorage alanındadır; cihazlar arası senkronizasyon ve hesap sistemi yoktur.
-- Kamuya açık yayın yaparsanız API maliyetleri ve kötüye kullanım riskleri için Netlify Identity/harici auth, rate limiting ve kota ekleyin.
-- Supadata API yanıt şeması değişirse `netlify/functions/transcript.mjs` adaptörü güncellenmelidir.
-- SRT/VTT zamanları sağlayıcının zaman birimine bağlıdır; bu uygulama saniye bekler. Servis milisaniye döndürüyorsa dönüştürme gerekir.
-
-## Lokal geliştirme
-
-`npm install` ardından `npx netlify dev`. `.env` dosyası oluşturup anahtarları yerel ortamda tanımlayın; `.env` dosyasını repoya göndermeyin.
+Önce YouTube'un herkese açık sayfasından altyazı çekmeyi dener. Bu yol YouTube kısıtlamaları nedeniyle her zaman çalışmayabilir; sonra Supadata API kullanır. Supadata ücret/kredi sınırları devam eder. Bu proje sınırsız transkript garantisi vermez.

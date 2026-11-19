@@ -1,1 +1,1 @@
-{"name":"ramo-transcript-studio","version":"1.0.0","private":true,"scripts":{"dev":"netlify dev","build":"node -e \"console.log('Static site ready')\""},"dependencies":{},"devDependencies":{"netlify-cli":"^23.0.0"}}
+{"name":"ramoaltyazi","version":"2.0.0","private":true,"type":"module","engines":{"node":">=18"}}
