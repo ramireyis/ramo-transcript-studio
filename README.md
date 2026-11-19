@@ -1,14 +1,5 @@
-# RamoAltyazi v2
+# RamoAltyazi v4 — kredi kullanmayan sürüm
 
-Sade, dört dilli YouTube transkript paneli. Netlify Functions kullanır.
+Supadata veya başka ücretli API çağrısı içermez. Önce YouTube'un herkese açık sayfalarındaki altyazı listelerini ve farklı altyazı biçimlerini dener. Sunucu erişimi engellenirse kullanıcıya YouTube'dan metni kopyalayıp panelde düzenleme seçeneği gösterir. Her video için otomatik başarı garantisi yoktur.
 
-## Kurulum
-
-1. ZIP içeriğini GitHub deposunun köküne yükleyin. `netlify/functions/transcript.mjs` dosyasının klasör yolunu koruyun.
-2. Netlify projesini GitHub deposuna bağlayın; build command boş, publish directory `.` olabilir. `netlify.toml` fonksiyon klasörünü belirtir.
-3. Netlify > Project configuration > Environment variables bölümünde `SUPADATA_API_KEY` değerini ekleyin. Anahtarı asla GitHub'a veya HTML dosyasına koymayın.
-4. Yeni deploy yapın. `/api/transcript` POST endpoint'ini panelden test edin.
-
-ÖNEMLİ: Bu sürüm mevcut `index.html`, `netlify.toml`, `package.json` ve `netlify/functions/transcript.mjs` dosyalarının yerini alır. Eski sürümü önce yedekleyin. Diğer eski fonksiyonlar kullanılıyorsa yerinde kalabilir, ancak yeni arayüz yalnızca transcript fonksiyonunu çağırır.
-
-Önce YouTube'un herkese açık sayfasından altyazı çekmeyi dener. Bu yol YouTube kısıtlamaları nedeniyle her zaman çalışmayabilir; sonra Supadata API kullanır. Supadata ücret/kredi sınırları devam eder. Bu proje sınırsız transkript garantisi vermez.
+GitHub deposunun köküne ZIP içindeki dosyaları doğru yollarıyla yerleştirin. `netlify/functions/transcript.mjs` yolunu koruyun. `netlify.toml` redirect ve functions ayarlarını içerir. Netlify deploy sonrası bir videoyla test edin. Mevcut siteyi değiştirmeden önce yedek alın.
