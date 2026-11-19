@@ -13,5 +13,33 @@ async function youtube(id,lang){let tracks=[];for(const page of [`https://www.yo
  const seg=await parseCaptions(track.baseUrl);if(!seg)return {ok:false,reason:'Altyazı dosyası YouTube tarafından sunucuya verilmedi.'};
  return {ok:true,text:seg.map(s=>s.text).join(' ').replace(/\s+/g,' ').trim(),segments:seg,source:'youtube',language:track.languageCode};
 }
-export default async function(request){if(request.method!=='POST')return json(405,{error:'POST gerekli'});try{const b=await request.json(),id=videoId(b.url),lang=langs.has(b.lang)?b.lang:'auto';if(!id)return json(400,{error:'Geçerli YouTube video bağlantısı gir.'});const result=await youtube(id,lang);return json(200,result)}catch{return json(200,{ok:false,reason:'Ücretsiz altyazı şu anda alınamadı. Kredi kullanılmadı.'})}}
+async function supadata(id,lang){
+ const key=process.env.SUPADATA_API_KEY;
+ if(!key)return {ok:false,reason:'Supadata anahtarı Netlify ortam değişkenlerinde tanımlı değil.'};
+ const u=new URL('https://api.supadata.ai/v1/youtube/transcript');
+ u.searchParams.set('url',`https://www.youtube.com/watch?v=${id}`);
+ if(lang!=='auto')u.searchParams.set('lang',lang);
+ const r=await fetch(u,{headers:{'x-api-key':key,'accept':'application/json'},signal:AbortSignal.timeout(24000)});
+ const data=await r.json().catch(()=>({}));
+ if(!r.ok)return {ok:false,reason:'Supadata transkripti sağlayamadı ('+r.status+').'};
+ const content=data.content??data.transcript??data.text??[];
+ const segments=Array.isArray(content)?content.map(x=>({start:Number(x.offset??x.start??0),text:String(x.text||'').trim()})).filter(x=>x.text):[];
+ const text=typeof content==='string'?content:segments.map(s=>s.text).join(' ');
+ if(!text.trim())return {ok:false,reason:'Supadata boş sonuç döndürdü.'};
+ const returned=String(data.lang??data.language??'').toLowerCase();
+ if(lang!=='auto'&&returned&&returned!==lang&&!returned.startsWith(lang+'-'))return {ok:false,reason:'Supadata farklı dilde sonuç döndürdü ('+returned+'). Kredi kullanılmış olabilir.'};
+ return {ok:true,text,segments,source:'supadata',language:returned||lang};
+}
+export default async function(request){
+ if(request.method!=='POST')return json(405,{error:'POST gerekli'});
+ try{
+  const b=await request.json(),id=videoId(b.url),lang=langs.has(b.lang)?b.lang:'auto';
+  if(!id)return json(400,{error:'Geçerli YouTube video bağlantısı gir.'});
+  const free=await youtube(id,lang);
+  if(free.ok)return json(200,free);
+  
+  try{const paid=await supadata(id,lang);return json(200,paid.ok?paid:{...paid,freeReason:free.reason,creditMayBeUsed:true})}
+  catch{return json(200,{ok:false,reason:'Ücretsiz yöntemler ve Supadata sonuç vermedi.',creditMayBeUsed:true})}
+ }catch{return json(200,{ok:false,reason:'İşlem tamamlanamadı. Lütfen yeniden deneyin.'})}
+}
 export const config={path:'/api/transcript'};
