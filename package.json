@@ -1,0 +1,1 @@
+{"name":"ramo-transcript-studio","version":"1.0.0","private":true,"scripts":{"dev":"netlify dev","build":"node -e \"console.log('Static site ready')\""},"dependencies":{},"devDependencies":{"netlify-cli":"^23.0.0"}}
